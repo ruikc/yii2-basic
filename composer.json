@@ -36,15 +36,11 @@
     },
     "scripts": {
         "post-install-cmd": [
-            "yii\\composer\\Installer::postInstall",
-            "app\\components\\ComposerInstaller::initProject"
+            "yii\\composer\\Installer::postInstall"
         ],
         "post-create-project-cmd": [
             "yii\\composer\\Installer::postCreateProject",
             "yii\\composer\\Installer::postInstall"
-        ],
-        "post-update-cmd": [
-            "app\\components\\ComposerInstaller::initProject"
         ]
     },
     "extra": {
