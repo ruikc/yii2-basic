@@ -4,9 +4,7 @@ namespace app\controllers;
 
 use Yii;
 use yii\data\ActiveDataProvider;
-use yii\helpers\ArrayHelper;
 use yii\web\Controller;
-use yii\filters\auth\QueryParamAuth;
 use yii\filters\auth\HttpBearerAuth;
 use yii\filters\auth\CompositeAuth;
 
@@ -37,9 +35,9 @@ class RestController extends Controller
         //是否需要登录操作
         if (!in_array(Yii::$app->controller->action->id, $this->except) && !in_array('*', $this->except)) {
             $behaviors[] = [
-                'class' => CompositeAuth::className(),
+                'class' => CompositeAuth::class,
                 'authMethods' => [
-                    HttpBearerAuth::className(),
+                    HttpBearerAuth::class,
 //                    QueryParamAuth::className(),
                 ]
             ];
@@ -61,8 +59,8 @@ class RestController extends Controller
         if ($data instanceof ActiveDataProvider) {
             $result = [];
             $result['data'] = $data->getModels();
-//            $result['data'] = $data->query->asArray()->all();
             $result['total'] = $data->totalCount;
+            $result['pages'] = $data->pagination->pageCount;
             $data = $result;
         }
         Yii::$app->getResponse()->statusText = $msg;

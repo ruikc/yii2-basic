@@ -120,8 +120,7 @@ a.desc:after {
 .select2-container--krajee .select2-selection__clear {
     line-height: 1;
 }
-
-
+.fa { margin-right: 10px;}
 .tree_left{ padding-left: 0;}
 .treeview span.icon.node-icon  {
     width: 12px;
@@ -144,13 +143,15 @@ a.desc:after {
     padding: 0 30px;
     line-height: 38px;
 }
+.red{ color: red }
 
 .select-button:hover{
     background-color: #e4606d;
     color: #fff;
 }
-.files_item{ width: 100%; position: relative;padding: 10px; background-color: #efefef; margin-top: 5px;}
-.files_item .name{width: 100%; }
+.files_item{ width: 100%; position: relative;padding: 0 10px; background-color: #efefef; margin-top: 5px;}
+.files_item .name{width: 100%; padding: 10px 0; }
 .files_item .name a{position: absolute; top: 10px; right: 10px;}
-.files_item .upload_process{ width: 100%; height: 5px; overflow: hidden;}
+.files_item .upload_process{ width: 100%; height: 2px; overflow: hidden;}
 .files_item .process{ width: 0%; height: 5px; overflow: hidden; background-color: #e4606d;}
+.modal-content{width: 800px;}

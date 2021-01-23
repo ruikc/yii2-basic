@@ -3,40 +3,14 @@
 namespace app\controllers;
 
 use Yii;
-use yii\filters\AccessControl;
-use yii\web\Controller;
+use yii\helpers\Url;
+use yii\web\NotFoundHttpException;
 use yii\web\Response;
-use yii\filters\VerbFilter;
 use app\models\LoginForm;
-use app\models\ContactForm;
 
-class SiteController extends Controller
+class SiteController extends BaseController
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function behaviors()
-    {
-        return [
-            'access' => [
-                'class' => AccessControl::className(),
-                'only' => ['logout'],
-                'rules' => [
-                    [
-                        'actions' => ['logout'],
-                        'allow' => true,
-                        'roles' => ['@'],
-                    ],
-                ],
-            ],
-            'verbs' => [
-                'class' => VerbFilter::className(),
-                'actions' => [
-                    'logout' => ['post'],
-                ],
-            ],
-        ];
-    }
+    public $except = ['login', 'captcha', 'error'];
 
     /**
      * {@inheritdoc}
@@ -49,7 +23,9 @@ class SiteController extends Controller
             ],
             'captcha' => [
                 'class' => 'yii\captcha\CaptchaAction',
-                'fixedVerifyCode' => YII_ENV_TEST ? 'testme' : null,
+                'fixedVerifyCode' => null,
+                'maxLength' => 5,
+                'minLength' => 5
             ],
         ];
     }
@@ -94,35 +70,43 @@ class SiteController extends Controller
     public function actionLogout()
     {
         Yii::$app->user->logout();
-
         return $this->goHome();
     }
 
     /**
-     * Displays contact page.
-     *
-     * @return Response|string
+     * 修改密码
+     * @name: actionReset
+     * @return string|Response
+     * @author: rickeryu <lhyfe1987@163.com>
+     * @time: 2018/11/7 14:35
      */
-    public function actionContact()
-    {
-        $model = new ContactForm();
-        if ($model->load(Yii::$app->request->post()) && $model->contact(Yii::$app->params['adminEmail'])) {
-            Yii::$app->session->setFlash('contactFormSubmitted');
+    public function actionReset() {
 
-            return $this->refresh();
+        $model = new ResetForm();
+        if ($model->load(Yii::$app->request->post())) {
+            if ($model->reset()) {
+                Yii::$app->session->setFlash('success', '密码修改成功');
+                return $this->redirect(['reset']);
+            }
         }
-        return $this->render('contact', [
+        return $this->render('reset', [
             'model' => $model,
         ]);
     }
 
+
+
+
     /**
-     * Displays about page.
-     *
+     * 移动端下载
+     * @name: actionMobile
+     * @param $id
      * @return string
+     * @throws NotFoundHttpException
+     * @author: rickeryu <lhyfe1987@163.com>
+     * @time: 2020/1/6 8:24 下午
      */
-    public function actionAbout()
-    {
-        return $this->render('about');
+    public function actionMobile() {
+        return $this->render('mobile', ['model' => null]);
     }
 }

@@ -20,7 +20,8 @@ class Utils extends BaseObject
      * @author: rickeryu <lhyfe1987@163.com>
      * @time: 2018-12-26 14:05
      */
-    public static function is_mobile($mobile) {
+    public static function is_mobile($mobile)
+    {
         $rule = '/1[3458679]{1}\d{9}$/';
         return preg_match($rule, $mobile);
     }
@@ -35,7 +36,8 @@ class Utils extends BaseObject
      * @author: rickeryu <lhyfe1987@163.com>
      * @time: 2018/10/9 11:08
      */
-    public static function get_short($str, $length = 40, $ext = '...') {
+    public static function get_short($str, $length = 40, $ext = '...')
+    {
         $tmpStr = strip_tags(htmlspecialchars_decode($str));
         $tmpStr = preg_replace('/^(&nbsp;|\s)*|(&nbsp;|\s)*$/', '', $tmpStr);
         $tmpLen = mb_strlen($tmpStr, 'utf-8');
@@ -55,7 +57,8 @@ class Utils extends BaseObject
      * @author: rickeryu <lhyfe1987@163.com>
      * @time: 2018/10/12 16:32
      */
-    public static function downLoad($url, $filename) {
+    public static function downLoad($url, $filename)
+    {
         $header = get_headers($url, 1);
         $size = $header['Content-Length'];
         $fp = fopen($url, 'rb');
@@ -95,7 +98,8 @@ class Utils extends BaseObject
      * @author: rickeryu <lhyfe1987@163.com>
      * @time: 2019-01-19 12:48
      */
-    public static function setFileName($filename) {
+    public static function setFileName($filename)
+    {
         $encoded_filename = urlencode($filename);
         $encoded_filename = str_replace("+", "%20", $encoded_filename);
         $ua = $_SERVER["HTTP_USER_AGENT"];
@@ -117,7 +121,8 @@ class Utils extends BaseObject
      * @author: rickeryu <lhyfe1987@163.com>
      * @time: 2019-06-13 16:43
      */
-    public static function str_len($str) {
+    public static function str_len($str)
+    {
         $str = htmlspecialchars_decode($str);
         $str = strip_tags($str);
         $str = htmlspecialchars_decode($str);
@@ -144,7 +149,8 @@ class Utils extends BaseObject
      * @author: rickeryu <lhyfe1987@163.com>
      * @time: 2019-04-17 13:39
      */
-    public static function lineSplit($content) {
+    public static function lineSplit($content)
+    {
         $order = ["\r\n", "\n", "\r"];
         $content = str_replace($order, PHP_EOL, $content);
         foreach ($result = explode(PHP_EOL, $content) as $key => $val) {
@@ -160,7 +166,8 @@ class Utils extends BaseObject
      *  * @param  int $length 需要生成的随机数个数
      *  * @return number      生成的随机数
      *  */
-    public static function getRandNumber($length = 8, $start = 1, $end = 9) {
+    public static function getRandNumber($length = 8, $start = 1, $end = 9)
+    {
         //初始化变量为0
         $num = 0;
         //建一个新数组
@@ -194,7 +201,8 @@ class Utils extends BaseObject
      * @author: rickeryu <lhyfe1987@163.com>
      * @time: 2019/10/11 4:44 下午
      */
-    public static function curlData($url, $data = []) {
+    public static function curlData($url, $data = [])
+    {
         if (!empty($data)) {
             $url = $url . '?' . http_build_query($data);
         }
@@ -216,7 +224,8 @@ class Utils extends BaseObject
      * @author: rickeryu <lhyfe1987@163.com>
      * @time: 2019/11/7 2:45 下午
      */
-    public static function genTree($items, $pid = "parent_id") {
+    public static function genTree($items, $pid = "parent_id")
+    {
         $map = [];
         $tree = [];
         foreach ($items as &$it) {
@@ -242,10 +251,11 @@ class Utils extends BaseObject
      * @author: rickeryu <lhyfe1987@163.com>
      * @time: 2019/11/13 2:34 下午
      */
-    public static function diffYear($start,$end){
-        $s = date('Y',strtotime($start));
-        $e = date('Y',strtotime($end));
-        return (int)$e-(int)$s;
+    public static function diffYear($start, $end)
+    {
+        $s = date('Y', strtotime($start));
+        $e = date('Y', strtotime($end));
+        return (int)$e - (int)$s;
     }
 
     /**
@@ -257,7 +267,8 @@ class Utils extends BaseObject
      * @author: rickeryu <lhyfe1987@163.com>
      * @time: 2019/11/28 1:37 下午
      */
-    public static function baiduMap($addr) {
+    public static function baiduMap($addr)
+    {
         //0CNPLC3fihOBzYRtznNFUFDdnoojhFDQ
         //http://api.map.baidu.com/geocoding/v3/?address=北京市海淀区上地十街10号&output=json&ak=您的ak&callback=showLocation
         $client = new Client();
@@ -277,5 +288,56 @@ class Utils extends BaseObject
             }
         }
         return '';
+    }
+
+    /**
+     * ID进行加密处理
+     * @name: encodeId
+     * @param $id
+     * @param $user_id
+     * @return string
+     * @author: ruikc <yuzy@soocedu.com>
+     * @time: 2021/1/6 2:16 下午
+     */
+    public static function encodeId($id, $user_id)
+    {
+        return base64_encode(\Yii::$app->security->encryptByKey($id, $user_id, null));
+    }
+
+    /**
+     * 解密ID
+     * @name: decodeId
+     * @param $data
+     * @param $user_id
+     * @return bool|string
+     * @author: ruikc <yuzy@soocedu.com>
+     * @time: 2021/1/6 2:18 下午
+     */
+    public static function decodeId($data, $user_id)
+    {
+        return \Yii::$app->security->decryptByKey(base64_decode($data), $user_id, null);
+    }
+
+    /**
+     * 从来没有产生一个唯一的激活码
+     * @return string
+     */
+    public static function create_guid($namespace = null)
+    {
+        static $guid = '';
+        $uid = uniqid("", true);
+
+        $data = $namespace;
+        $data .= $_SERVER ['REQUEST_TIME'];    // 请求那一刻的时间戳
+        $data .= $_SERVER ['HTTP_USER_AGENT'];    // 获取訪问者在用什么操作系统
+        $data .= $_SERVER ['SERVER_ADDR'];        // serverIP
+        $data .= $_SERVER ['SERVER_PORT'];        // port号
+        $data .= $_SERVER ['REMOTE_ADDR'];        // 远程IP
+        $data .= $_SERVER ['REMOTE_PORT'];        // port信息
+
+        $hash = strtoupper(hash('ripemd128', $uid . $guid . md5($data)));
+        $guid = '{' . substr($hash, 0, 8) . '-' . substr($hash, 8, 4) . '-' . substr($hash, 12, 4) . '-' . substr($hash, 16, 4) . '-' . substr($hash, 20, 12) . '}';
+
+        return $guid;
     }
 }

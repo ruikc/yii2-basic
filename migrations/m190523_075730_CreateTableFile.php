@@ -22,6 +22,7 @@ class m190523_075730_CreateTableFile extends Migration
             'id' => $this->primaryKey()->unsigned()->comment('文件id'),
             'user_id' => $this->integer()->notNull()->unsigned()->defaultValue(0)->comment('用户id'),
             'name' => $this->string(100)->notNull()->defaultValue('')->comment('文件名'),
+            'domain' => $this->string(100)->notNull()->defaultValue('')->comment('七牛域名'),
             'key' => $this->string(100)->notNull()->defaultValue('')->comment('文件key'),
             'ext' => $this->string(10)->notNull()->defaultValue('')->comment('扩展名'),
             'size' => $this->integer()->unsigned()->notNull()->defaultValue(0)->comment('上传文件大小'),

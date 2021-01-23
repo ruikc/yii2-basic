@@ -2,24 +2,41 @@
 
 namespace app\controllers;
 
-use app\models\Config;
-use app\models\Dept;
-use app\models\Menu;
-use app\models\Role;
 use Yii;
-use yii\data\Pagination;
-use yii\db\Expression;
 use yii\helpers\ArrayHelper;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
-use yii\filters\AccessControl;
 use yii\web\ForbiddenHttpException;
 
 /**
- * UserController implements the CRUD actions for User model.
+ * BaseController implements the CRUD actions for User model.
  */
 class BaseController extends Controller
 {
+    /**
+     * @var array 免登录方法数组，* 代表全部方法免登录
+     */
+    public $except = [];
+
+    /**
+     *
+     * @name: beforeAction
+     * @param \yii\base\Action $action
+     * @return bool|void
+     * @throws \yii\web\BadRequestHttpException
+     * @author: rickeryu <lhyfe1987@163.com>
+     * @time: 2020/5/23 10:16 下午
+     */
+    public function beforeAction($action) {
+        parent::beforeAction($action);
+        //是否需要登录操作
+        if (!in_array(Yii::$app->controller->action->id, $this->except) && !in_array('*', $this->except)) {
+            // 权限验证
+            return $this->_auth();
+        }
+        return true;
+    }
+
     /**
      * 重写行为，配置接口以json形式返回数据
      * 允许跨域操作
@@ -30,19 +47,8 @@ class BaseController extends Controller
      */
     public function behaviors() {
         $behaviors = parent::behaviors();
-        // 权限验证
-        $this->_auth();
-        $behaviors['access'] = [
-            'class' => AccessControl::className(),
-            'rules' => [
-                [
-                    'allow' => true,
-                    'roles' => ['@'],
-                ],
-            ],
-        ];
         $behaviors['verbs'] = [
-            'class' => VerbFilter::className(),
+            'class' => VerbFilter::class,
             'actions' => [
                 'delete' => ['POST'],
             ],
@@ -53,39 +59,20 @@ class BaseController extends Controller
     /**
      * 权限验证简化版
      * @name: _auth
-     * @return bool|\yii\web\Response
-     * @throws ForbiddenHttpException
+     * @return bool|void
      * @author: rickeryu <lhyfe1987@163.com>
-     * @time: 2019/11/6 1:51 下午
+     * @time: 2020/5/23 10:15 下午
      */
     private function _auth() {
-
         $user = Yii::$app->user;
         //如果没有登录就跳转到登录页面
         if ($user->isGuest) {
-            return $this->redirect('site/login');
+            return $this->redirect(['/site/login'])->send();
         }
-        if ($user->id == 1) {
-            return true;
+        if (!$user->identity->is_admin) {
+            return false;
         }
-        // 非管理员用户组
-        if ($user->identity->role_id != 0) {
-            $menu = Menu::find()->where(['url' => '/' . Yii::$app->controller->route])->one();
-            // 没找到菜单的情况下
-            if (!$menu) {
-                $this->_no_auth();
-            }
-
-            $role_count = Role::find()->where(['=', 'id', $user->identity->role_id])
-                ->andWhere(new Expression('FIND_IN_SET(:url, rules)'))
-                ->addParams([':url' => $menu['id']])
-                ->count();
-
-            // 有菜单且没权限
-            if (!$role_count) {
-                $this->_no_auth();
-            }
-        }
+        return true;
     }
 
     /**

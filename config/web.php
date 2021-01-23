@@ -68,6 +68,11 @@ $config = [
         ],
     ],
     'params' => $params,
+    'modules' => [
+        'v1' => [
+            'class' => 'app\modules\v1\Module',
+        ],
+    ],
 ];
 
 if (YII_ENV_DEV) {
@@ -82,8 +87,15 @@ if (YII_ENV_DEV) {
     $config['bootstrap'][] = 'gii';
     $config['modules']['gii'] = [
         'class' => 'yii\gii\Module',
-        // uncomment the following to add your IP if you are not connecting from localhost.
-        //'allowedIPs' => ['127.0.0.1', '::1'],
+        'allowedIPs' => ['127.0.0.1', '::1', '172.16.14.68'],
+        'generators' => [ //here
+            'adminlte' => [
+                'class' => 'yii\gii\generators\crud\Generator',
+                'templates' => [
+                    'adminlte' => '@app/gii/adminlte_ajax/crud/simple',
+                ]
+            ]
+        ],
     ];
 }
 

@@ -60,7 +60,7 @@ class DefaultController extends RestController
      */
     public function actionUpload() {
         $app = \Yii::$app;
-        $file = $_FILES['upfile'];
+        $file = $_FILES['file'];
         if (!$file) {
             $this->error('请选择上件的文件');
         }

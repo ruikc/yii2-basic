@@ -1,47 +1,62 @@
 <?php
 
-/* @var $this yii\web\View */
-/* @var $form yii\bootstrap\ActiveForm */
-/* @var $model app\models\LoginForm */
-
+use yii\captcha\Captcha;
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
 
-$this->title = 'Login';
-$this->params['breadcrumbs'][] = $this->title;
+/* @var $this yii\web\View */
+/* @var $form yii\bootstrap\ActiveForm */
+/* @var $model \backend\models\LoginForm */
+
+$this->title = '后台管理系统登录';
+
+$fieldOptions1 = [
+    'options' => ['class' => 'form-group has-feedback'],
+    'inputTemplate' => "{input}<span class='glyphicon glyphicon-envelope form-control-feedback'></span>"
+];
+
+$fieldOptions2 = [
+    'options' => ['class' => 'form-group has-feedback'],
+    'inputTemplate' => "{input}<span class='glyphicon glyphicon-lock form-control-feedback'></span>"
+];
 ?>
-<div class="site-login">
-    <h1><?= Html::encode($this->title) ?></h1>
 
-    <p>Please fill out the following fields to login:</p>
-
-    <?php $form = ActiveForm::begin([
-        'id' => 'login-form',
-        'layout' => 'horizontal',
-        'fieldConfig' => [
-            'template' => "{label}\n<div class=\"col-lg-3\">{input}</div>\n<div class=\"col-lg-8\">{error}</div>",
-            'labelOptions' => ['class' => 'col-lg-1 control-label'],
-        ],
-    ]); ?>
-
-        <?= $form->field($model, 'username')->textInput(['autofocus' => true]) ?>
-
-        <?= $form->field($model, 'password')->passwordInput() ?>
-
-        <?= $form->field($model, 'rememberMe')->checkbox([
-            'template' => "<div class=\"col-lg-offset-1 col-lg-3\">{input} {label}</div>\n<div class=\"col-lg-8\">{error}</div>",
-        ]) ?>
-
-        <div class="form-group">
-            <div class="col-lg-offset-1 col-lg-11">
-                <?= Html::submitButton('Login', ['class' => 'btn btn-primary', 'name' => 'login-button']) ?>
-            </div>
-        </div>
-
-    <?php ActiveForm::end(); ?>
-
-    <div class="col-lg-offset-1" style="color:#999;">
-        You may login with <strong>admin/admin</strong> or <strong>demo/demo</strong>.<br>
-        To modify the username/password, please check out the code <code>app\models\User::$users</code>.
+<div class="login-box">
+    <div class="login-logo" style="color: white;">
+        <a style="color: white;" href="#"><b>后台</b>管理系统登录</a>
     </div>
-</div>
+    <!-- /.login-logo -->
+    <div class="login-box-body">
+        <p class="login-box-msg">请先登录后台系统</p>
+
+        <?php $form = ActiveForm::begin(['id' => 'login-form', 'enableClientValidation' => false]); ?>
+
+        <?= $form
+            ->field($model, 'username', $fieldOptions1)
+            ->label(false)
+            ->textInput(['placeholder' =>'登录账号']) ?>
+
+        <?= $form
+            ->field($model, 'password', $fieldOptions2)
+            ->label(false)
+            ->passwordInput(['placeholder' => '登录密码']) ?>
+
+        <?= $form->field($model, 'verifyCode')->widget(Captcha::class, [
+            'template' => '<div class="row"><div class="col-lg-6">{input}</div><div class="col-lg-3">{image}</div></div>',
+            'options'=>['placeholder' => '图片验证码']
+        ])->label(false) ?>
+
+        <?= Html::submitButton('登 录', ['class' => 'btn btn-danger btn-block btn-flat', 'name' => 'login-button']) ?>
+
+        <?php ActiveForm::end(); ?>
+        <div style="width: 100%; padding: 10px 0 0 0; text-align: left;">
+            网站备案号：<a href="http://www.beian.miit.gov.cn" style="color: #999;" target="_blank">鲁ICP备12015075号-5</a>
+        </div>
+        <div style="display: none">
+            <script type="text/javascript" src="https://v1.cnzz.com/z_stat.php?id=1279029782&web_id=1279029782"></script>
+        </div>
+    </div>
+
+
+    <!-- /.login-box-body -->
+</div><!-- /.login-box -->

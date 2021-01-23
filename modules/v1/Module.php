@@ -26,7 +26,6 @@ class Module extends \yii\base\Module
                 'charset' => 'UTF-8',
                 'on beforeSend' => function ($event) {
                     $response = $event->sender;
-                    $data = [];
                     $data = [
                         'status' => $response->getStatusCode(),
                         'message' => $response->statusText
@@ -34,13 +33,11 @@ class Module extends \yii\base\Module
                     if (isset($response->data['data'])) {
                         $data['data'] = $response->data['data'];
                         $data['total'] = $response->data['total'];
-                    }else{
-                        $data['data']= $response->data;
+                        $data['pages'] = $response->data['pages'];
+                    } else if( $response->data ) {
+                        $data['data'] = $response->data;
                     }
                     $response->data = $data;
-                    if (empty($response->data['data'])) {
-                        unset($response->data['data']);
-                    }
                     if ($response->data['status'] == 401) {
                         $response->data['message'] = '账号已经退出，请重新登录';
                     }

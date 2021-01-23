@@ -3,20 +3,19 @@
 namespace app\models;
 
 use Yii;
+use yii\base\InvalidConfigException;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
+use yii\helpers\ArrayHelper;
 
 class Base extends ActiveRecord
 {
 
-    const STATUS_DELETED = 0; //静态变量，状态为删除
-    const STATUS_ACTIVE = 10; //静态变量，状态为启用
-    const STATUS_UNACTIVE = 20; //静态变量，状态为禁用
-
     /**
      * @inheritdoc
      */
-    public function behaviors() {
+    public function behaviors()
+    {
         return [
             TimestampBehavior::class,
         ];
@@ -28,11 +27,12 @@ class Base extends ActiveRecord
      * @param bool $insert
      * @param array $changedAttributes
      * @return void
-     * @throws \yii\base\InvalidConfigException
+     * @throws InvalidConfigException
      * @author: rickeryu <lhyfe1987@163.com>
      * @time: 2020/3/24 8:02 下午
      */
-    public function afterSave($insert, $changedAttributes) {
+    public function afterSave($insert, $changedAttributes)
+    {
         parent::afterSave($insert, $changedAttributes);
         $key = static::getPrimaryKey();
         $cacheKey = static::getTableName() . '_id_' . $key;
@@ -44,11 +44,12 @@ class Base extends ActiveRecord
      * @name: findDataById
      * @param $id
      * @return Base|mixed|null
-     * @throws \yii\base\InvalidConfigException
+     * @throws InvalidConfigException
      * @author: rickeryu <lhyfe1987@163.com>
      * @time: 2020/3/24 8:02 下午
      */
-    public static function findDataById($id) {
+    public static function findDataById($id)
+    {
         $cacheKey = static::getTableName() . '_id_' . $id;
         $data = Yii::$app->cache->get($cacheKey);
         if (!$data) {
@@ -66,16 +67,17 @@ class Base extends ActiveRecord
      * @author: rickeryu <lhyfe1987@163.com>
      * @time: 17/11/1 下午3:01
      */
-    public static function getStatus($status = '') {
+    public static function getStatus($status = '')
+    {
         $result = [
-            static::STATUS_DELETED => '删除',
-            static::STATUS_ACTIVE => '启用',
-            static::STATUS_UNACTIVE => '禁用',
+            0 => '删除',
+            10 => '启用',
+            20 => '禁用',
         ];
         if ($status !== '') {
             return $result[$status];
         }
-        unset($result[static::STATUS_DELETED]);
+        unset($result[0]);
         return $result;
     }
 
@@ -89,7 +91,8 @@ class Base extends ActiveRecord
      * @author: rickeryu <lhyfe1987@163.com>
      * @time: 2017/12/4 下午3:27
      */
-    public static function cacheFind($id, $clean = false, $key = 'id') {
+    public static function cacheFind($id, $clean = false, $key = 'id')
+    {
         if (empty($id)) {
             return false;
         }
@@ -122,7 +125,8 @@ class Base extends ActiveRecord
      * @author: rickeryu <lhyfe1987@163.com>
      * @time: 2018/5/26 09:58
      */
-    public static function modelField($id, $field = 'title', $default = '') {
+    public static function modelField($id, $field = 'title', $default = '')
+    {
         if (!$id) {
             return $default;
         }
@@ -139,7 +143,8 @@ class Base extends ActiveRecord
      * @author: rickeryu <lhyfe1987@163.com>
      * @time: 2018/4/10 10:08
      */
-    private static function formatArray($array) {
+    private static function formatArray($array)
+    {
         asort($array);
         foreach ($array as $key => $val) {
             $array[$key] = $val . '';
@@ -151,12 +156,26 @@ class Base extends ActiveRecord
      * 得到表名称
      * @name: getTableName
      * @return string
-     * @throws \yii\base\InvalidConfigException
+     * @throws InvalidConfigException
      * @author: rickeryu <lhyfe1987@163.com>
      * @time: 2018/4/23 19:26
      */
-    private static function getTableName() {
+    private static function getTableName()
+    {
         return static::getTableSchema()->fullName;
+    }
+
+    /**
+     * select2得到数据
+     * @name: select2
+     * @return array|\yii\db\ActiveRecord[]
+     * @author: rickeryu <lhyfe1987@163.com>
+     * @time: 2019/11/7 10:07 上午
+     */
+    public static function select2($field = 'name',$except=[0])
+    {
+        $data = self::find()->andWhere(['>', 'status', 0])->andWhere(['not in','id',$except])->select('id,' . $field . ' as text')->asArray()->all();
+        return ArrayHelper::map($data, 'id', 'text');
     }
 
 }

@@ -66,8 +66,11 @@ var QiNiu = function (id) {
                                     '                  <div class="process" style="width: 0%;"></div>\n' +
                                     '            </div>\n' +
                                     '     </div>';
-
-                                $('#' + obj.data('list')).html(tmp).css('display', 'block');
+                                if (obj.attr('multiple') != 'multiple') {
+                                    $('#' + obj.data('list')).html(tmp).css('display', 'block');
+                                } else {
+                                    $('#' + obj.data('list')).append(tmp).css('display', 'block');
+                                }
                                 $('.' + file_id).find('.cancel').click(function () {
                                     subscription.unsubscribe();
                                     $(this).closest('.files_item').remove();
@@ -78,6 +81,9 @@ var QiNiu = function (id) {
                     },
                     error: function (err) {
                         console.log(err);
+                        if (err.code == 403) {
+                            //禁止上传的格式
+                        }
                     },
                     complete: function (data) {
                         obj.url = url;
@@ -113,8 +119,16 @@ var QiNiu = function (id) {
                     } else {
                         $('.' + obj.file_id).find('.process').css('width', '0%');
                         $('.' + obj.file_id).find('.cancel').html('删除');
+                        if (obj.attr('multiple') != 'multiple') {
+                            $('.' + obj.file_id).find('.cancel').click(function () {
+                                $(this).closest('.files_item').remove();
+                                $('#' + id).val('');
+                            });
+                        }
                     }
-                    $('#' + id).val(res.id);
+                    if (obj.attr('multiple') != 'multiple') {
+                        $('#' + id).val(res.id);
+                    }
                 }
                 $('#' + that.id).val('');
                 if (typeof that.finish == 'function') {
@@ -127,6 +141,7 @@ var QiNiu = function (id) {
         $('#' + id).unbind("change").bind('change', function () {
             var obj = $(this);
             for (var i = 0; i < this.files.length; i++) {
+                console.log(this.files[i]);
                 that.ajaxToken(obj.data('url'), this.files[i], obj);
             }
         })
